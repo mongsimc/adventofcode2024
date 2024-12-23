@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	aoc "github.com/mongsimc/adventofcode/utils"
+	aoc "github.com/mongsimc/adventofcode2024/utils"
 )
 
 func main() {
