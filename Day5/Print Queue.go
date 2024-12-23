@@ -21,8 +21,7 @@ type PageOrder struct {
 
 func main() {
 
-
-	filename := "input.txt"
+	filename := "puzzle.input"
 	file, err := os.Open(filename)
 	defer file.Close()
 	if err != nil {

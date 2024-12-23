@@ -11,7 +11,7 @@ import (
 
 func main() {
 	fmt.Println("Reading file")
-	filename := "input.txt"
+	filename := "puzzle.input"
 	file, err := os.Open(filename)
 	if err != nil {
 		panic(err)

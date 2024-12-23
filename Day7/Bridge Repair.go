@@ -12,7 +12,7 @@ import (
 func main() {
 	t1 := time.Now()
 
-	lines := aoc.ReadFile("input.txt")
+	lines := aoc.ReadFile("puzzle.input")
 
 	answer1 := bruteForce(lines, []string{" + ", " * "})
 	answer2 := bruteForce(lines, []string{" + ", " * ", " || "})
@@ -110,4 +110,3 @@ func evaluateExpressionLeftToRight(expr string) int {
 
 	return result
 }
-

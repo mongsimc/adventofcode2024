@@ -15,7 +15,7 @@ type Coord struct {
 func main() {
 
 	fmt.Println("Reading file")
-	filename := "input.txt"
+	filename := "puzzle.input"
 	file, err := os.Open(filename)
 	defer file.Close()
 	if err != nil {
