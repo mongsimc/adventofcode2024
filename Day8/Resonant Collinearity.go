@@ -7,6 +7,12 @@ import (
 	aoc "github.com/mongsimc/adventofcode2024/utils"
 )
 
+type Coord struct {
+	X     int
+	Y     int
+	Value string
+}
+
 func main() {
 	t1 := time.Now()
 
