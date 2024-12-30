@@ -98,8 +98,7 @@ func main() {
 	ll = make([][]aoc.Coordinate, 0)
 	distinctList = make([][]aoc.Coordinate, 0)
 
-	answer1 := findTrailheadScore()
-	answer2 := SomeFunction2()
+	answer1, answer2 := findTrailheadScore()
 
 	fmt.Printf("Answer1: %d\n", answer1)
 	fmt.Printf("Answer2: %d\n", answer2)
@@ -109,7 +108,7 @@ func main() {
 	fmt.Printf("Time Taken: %v\n", t2.Sub(t1))
 }
 
-func findTrailheadScore() (answer int) {
+func findTrailheadScore() (answer, answer2 int) {
 
 	//nodeMap := make(map[aoc.Coordinate][]aoc.Coordinate, 0)
 	//paths := make([]aoc.Coordinate, 0)
@@ -134,7 +133,7 @@ func findTrailheadScore() (answer int) {
 	for _, v := range ll {
 		//fmt.Printf("Posible Paths: %v\n", v)
 		if len(v) == 10 {
-
+			answer2++
 			checkDistinctList(v)
 		}
 	}
@@ -246,10 +245,6 @@ func getAdjacent(current aoc.Coordinate, direction int) (aoc.Coordinate, bool) {
 
 }
 
-func hasAdjacent(current aoc.Coordinate) bool {
-	return false
-}
-
 func createPaths(ll LinkedList, current aoc.Coordinate, nodeMap map[aoc.Coordinate][]aoc.Coordinate, first bool) []LinkedList {
 	paths := make([]LinkedList, 0)
 	var new LinkedList
@@ -309,95 +304,4 @@ func findAdjacent(current aoc.Coordinate) []aoc.Coordinate {
 		nextCoords = append(nextCoords, down)
 	}
 	return nextCoords
-}
-
-func checkNext2(current aoc.Coordinate, direction int) (path []aoc.Coordinate) {
-	path = make([]aoc.Coordinate, 0)
-
-	//TODO: need to check if exist in current path, if not it will traverse back
-
-	switch direction {
-	case 1: //left
-		next := aoc.Coordinate{X: current.X, Y: current.Y - 1}
-		fmt.Printf("NextCoordinate: %v\n", next)
-		hasNext, nextOfNext := hasNextCoordinate(current)
-		fmt.Printf("HasNextCoordinate Result: %t and %v\n", hasNext, nextOfNext)
-		for hasNext {
-
-			for _, v := range nextOfNext {
-				hasNext, nextOfNext = hasNextCoordinate(v)
-				path = append(path, nextOfNext...)
-			}
-		}
-
-	case 2: //right
-		next := aoc.Coordinate{X: current.X, Y: current.Y + 1}
-		hasNext, nextOfNext := hasNextCoordinate(next)
-		for hasNext {
-
-			for _, v := range nextOfNext {
-				hasNext, nextOfNext = hasNextCoordinate(v)
-				path = append(path, nextOfNext...)
-			}
-		}
-	case 3: //up
-		next := aoc.Coordinate{X: current.X - 1, Y: current.Y}
-		hasNext, nextOfNext := hasNextCoordinate(next)
-		for hasNext {
-
-			for _, v := range nextOfNext {
-				hasNext, nextOfNext = hasNextCoordinate(v)
-				path = append(path, nextOfNext...)
-			}
-		}
-	case 4: //down
-		next := aoc.Coordinate{X: current.X + 1, Y: current.Y}
-		hasNext, nextOfNext := hasNextCoordinate(next)
-		for hasNext {
-
-			for _, v := range nextOfNext {
-				hasNext, nextOfNext = hasNextCoordinate(v)
-				path = append(path, nextOfNext...)
-			}
-		}
-	}
-	return path
-}
-
-func hasNextCoordinate(current aoc.Coordinate) (bool, []aoc.Coordinate) {
-	//TODO: need to check if exist in current path
-
-	nextCoordinates := make([]aoc.Coordinate, 0)
-
-	left := aoc.Coordinate{X: current.X, Y: current.Y - 1}
-	right := aoc.Coordinate{X: current.X, Y: current.Y + 1}
-	up := aoc.Coordinate{X: current.X - 1, Y: current.Y}
-	down := aoc.Coordinate{X: current.X + 1, Y: current.Y}
-
-	if input[left] >= 0 {
-		nextCoordinates = append(nextCoordinates, left)
-	}
-	if input[right] >= 0 {
-		nextCoordinates = append(nextCoordinates, right)
-	}
-	if input[up] >= 0 {
-		nextCoordinates = append(nextCoordinates, up)
-	}
-	if input[down] >= 0 {
-		nextCoordinates = append(nextCoordinates, down)
-	}
-
-	if len(nextCoordinates) > 0 {
-		return true, nextCoordinates
-	}
-
-	return false, nextCoordinates
-}
-
-func checkPathScore(paths []LinkedList) int {
-	return 0
-}
-
-func SomeFunction2() (answer int) {
-	return
 }

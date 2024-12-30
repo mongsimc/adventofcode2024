@@ -51,3 +51,27 @@ func ReadFileAsCoordinate(filename string) map[Coordinate]int {
 
 	return coords
 }
+
+func ReadFileAsCoordinateWithString(filename string) map[Coordinate]string {
+	file, err := os.Open(filename)
+	defer file.Close()
+	if err != nil {
+		panic(err)
+	}
+
+	scanner := bufio.NewScanner(file)
+	x := 0
+	coords := make(map[Coordinate]string)
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		for i := 0; i < len(line); i++ {
+			value := line[i : i+1]
+			coord := Coordinate{X: x, Y: i}
+			coords[coord] = value
+		}
+		x++
+	}
+
+	return coords
+}
