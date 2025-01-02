@@ -11,6 +11,10 @@ type Coordinate struct {
 	Y int
 }
 
+func (c Coordinate) ToString() string {
+	return "(" + strconv.Itoa(c.X) + "," + strconv.Itoa(c.Y) + ")"
+}
+
 func ReadFile(filename string) []string {
 	file, err := os.Open(filename)
 	defer file.Close()
@@ -52,7 +56,7 @@ func ReadFileAsCoordinate(filename string) map[Coordinate]int {
 	return coords
 }
 
-func ReadFileAsCoordinateWithString(filename string) (map[Coordinate]string, []Coordinate) {
+func ReadFileAsCoordinateWithString(filename string) (map[Coordinate]string, []Coordinate, int, int) {
 	file, err := os.Open(filename)
 	defer file.Close()
 	if err != nil {
@@ -63,6 +67,8 @@ func ReadFileAsCoordinateWithString(filename string) (map[Coordinate]string, []C
 	x := 0
 	coordMap := make(map[Coordinate]string)
 	coords := make([]Coordinate, 0)
+	maxRow := 0
+	maxCol := 0
 
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -71,9 +77,11 @@ func ReadFileAsCoordinateWithString(filename string) (map[Coordinate]string, []C
 			coord := Coordinate{X: x, Y: i}
 			coordMap[coord] = value
 			coords = append(coords, coord)
+			maxRow = x
+			maxCol = i
 		}
 		x++
 	}
 
-	return coordMap, coords
+	return coordMap, coords, maxRow, maxCol
 }

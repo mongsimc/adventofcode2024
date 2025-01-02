@@ -2,22 +2,20 @@ package main
 
 import (
 	"fmt"
-	"strconv"
-	"strings"
 	"time"
 
 	aoc "github.com/mongsimc/adventofcode2024/utils"
 )
 
-var input, coords = aoc.ReadFileAsCoordinateWithString("sample2.input")
+var input, coords, maxRow, maxCol = aoc.ReadFileAsCoordinateWithString("puzzle.input")
 var garden map[aoc.Coordinate]int
 var areaMap map[int]int
 var perimeterMap map[int]int
+var topPerimeterMap map[aoc.Coordinate]int
+var bottomPerimeterMap map[aoc.Coordinate]int
+var leftPerimeterMap map[aoc.Coordinate]int
+var rightPerimeterMap map[aoc.Coordinate]int
 var discountedPerimeterMap map[int]int
-var topPerimeterMap map[string]int
-var bottomPerimeterMap map[string]int
-var leftPerimeterMap map[string]int
-var rightPerimeterMap map[string]int
 var seq = 1
 
 func main() {
@@ -26,11 +24,11 @@ func main() {
 	garden = make(map[aoc.Coordinate]int)
 	areaMap = make(map[int]int)
 	perimeterMap = make(map[int]int)
+	topPerimeterMap = make(map[aoc.Coordinate]int)
+	bottomPerimeterMap = make(map[aoc.Coordinate]int)
+	leftPerimeterMap = make(map[aoc.Coordinate]int)
+	rightPerimeterMap = make(map[aoc.Coordinate]int)
 	discountedPerimeterMap = make(map[int]int)
-	topPerimeterMap = make(map[string]int)
-	bottomPerimeterMap = make(map[string]int)
-	leftPerimeterMap = make(map[string]int)
-	rightPerimeterMap = make(map[string]int)
 
 	for _, v := range coords {
 		plot := garden[v]
@@ -41,14 +39,39 @@ func main() {
 		}
 
 		groupPlant(v, plot)
-	}
 
-	calculateDiscountedPerimeter()
+		topPerimeterMap[getTopPerimeter(v, false)] = plot
+		bottomPerimeterMap[getBottomPerimeter(v, false)] = plot
+		leftPerimeterMap[getLeftPerimeter(v, false)] = plot
+		rightPerimeterMap[getRightPerimeter(v, false)] = plot
+
+	}
 
 	// fmt.Printf("Garden: %v\n", garden)
 	// fmt.Printf("AreaMap: %v\n", areaMap)
-	fmt.Printf("PerimeterMap: %v\n", perimeterMap)
-	fmt.Printf("DiscountedPerimeterMap: %v\n", discountedPerimeterMap)
+	// fmt.Printf("PerimeterMap: %v\n", perimeterMap)
+	// fmt.Printf("TopPerimeterMap: %v\n", topPerimeterMap)
+	// fmt.Printf("BottomPerimeterMap: %v\n", bottomPerimeterMap)
+	// fmt.Printf("LeftPerimeterMap: %v\n", leftPerimeterMap)
+	// fmt.Printf("RightPerimeterMap: %v\n", rightPerimeterMap)
+
+	for _, v := range topPerimeterMap {
+		discountedPerimeterMap[v] = discountedPerimeterMap[v] + 1
+	}
+
+	for _, v := range bottomPerimeterMap {
+		discountedPerimeterMap[v] = discountedPerimeterMap[v] + 1
+	}
+
+	for _, v := range leftPerimeterMap {
+		discountedPerimeterMap[v] = discountedPerimeterMap[v] + 1
+	}
+
+	for _, v := range rightPerimeterMap {
+		discountedPerimeterMap[v] = discountedPerimeterMap[v] + 1
+	}
+
+	//fmt.Printf("DiscountedPerimeterMap: %v\n", discountedPerimeterMap)
 
 	answer1 := calculatePrice()
 	answer2 := calculateDiscountedPrice()
@@ -59,29 +82,6 @@ func main() {
 	t2 := time.Now()
 
 	fmt.Printf("Time Taken: %v\n", t2.Sub(t1))
-}
-
-func calculateDiscountedPerimeter() {
-	for k, v := range topPerimeterMap {
-		keys := strings.Split(k, "_")
-		plot, _ := strconv.Atoi(keys[0])
-		discountedPerimeterMap[plot] = discountedPerimeterMap[plot] + v
-	}
-	for k, v := range bottomPerimeterMap {
-		keys := strings.Split(k, "_")
-		plot, _ := strconv.Atoi(keys[0])
-		discountedPerimeterMap[plot] = discountedPerimeterMap[plot] + v
-	}
-	for k, v := range leftPerimeterMap {
-		keys := strings.Split(k, "_")
-		plot, _ := strconv.Atoi(keys[0])
-		discountedPerimeterMap[plot] = discountedPerimeterMap[plot] + v
-	}
-	for k, v := range rightPerimeterMap {
-		keys := strings.Split(k, "_")
-		plot, _ := strconv.Atoi(keys[0])
-		discountedPerimeterMap[plot] = discountedPerimeterMap[plot] + v
-	}
 }
 
 func calculatePrice() (price int) {
@@ -112,72 +112,128 @@ func groupPlant(current aoc.Coordinate, plot int) {
 	area = area + 1
 	areaMap[plot] = area
 
-	hasLeft := false
-	hasTop := false
-	hasRight := false
-	hasBottom := false
-
 	p := 4
 
 	left := aoc.Coordinate{X: current.X, Y: current.Y - 1}
 	if input[left] == input[current] {
 		p--
-		hasLeft = true
 		groupPlant(left, plot)
 	}
 	right := aoc.Coordinate{X: current.X, Y: current.Y + 1}
 	if input[right] == input[current] {
 		p--
-		hasRight = true
 		groupPlant(right, plot)
 	}
 	top := aoc.Coordinate{X: current.X - 1, Y: current.Y}
 	if input[top] == input[current] {
 		p--
-		hasTop = true
 		groupPlant(top, plot)
 	}
 	bottom := aoc.Coordinate{X: current.X + 1, Y: current.Y}
 	if input[bottom] == input[current] {
 		p--
-		hasBottom = true
 		groupPlant(bottom, plot)
 	}
 
 	perimeterMap[plot] = perimeterMap[plot] + p
-
-	calculateContinuousPerimeter(current, plot, hasLeft, hasRight, hasTop, hasBottom)
-
 }
 
-func calculateContinuousPerimeter(current aoc.Coordinate, plot int, left, right, top, bottom bool) (perimeter int) {
-	horizontalKey := strconv.Itoa(plot) + "_" + strconv.Itoa(current.Y)
-	verticalKey := strconv.Itoa(plot) + "_" + strconv.Itoa(current.X)
+func getTopPerimeter(coord aoc.Coordinate, topMost bool) (topPerimeter aoc.Coordinate) {
 
-	topPerimeter := topPerimeterMap[horizontalKey]
-	bottomPerimeter := bottomPerimeterMap[horizontalKey]
-	leftPerimeter := leftPerimeterMap[verticalKey]
-	rightPerimeter := rightPerimeterMap[verticalKey]
+	if coord.X == 0 || topMost {
+		leftCoord := aoc.Coordinate{X: coord.X, Y: coord.Y - 1}
+		diagCoord := aoc.Coordinate{X: coord.X - 1, Y: coord.Y - 1}
 
-	if !top && !left {
-		topPerimeterMap[horizontalKey] = topPerimeter + 1
+		if garden[diagCoord] == garden[coord] {
+			return coord
+		}
+
+		if garden[leftCoord] != garden[coord] {
+			return coord
+		}
+
+		return getTopPerimeter(leftCoord, false)
 	}
 
-	if !left && !top {
-		leftPerimeterMap[verticalKey] = leftPerimeter + 1
+	topCoord := aoc.Coordinate{X: coord.X - 1, Y: coord.Y}
+	if garden[topCoord] != garden[coord] {
+		return getTopPerimeter(coord, true)
 	}
 
-	if !bottom && !left {
-		bottomPerimeterMap[horizontalKey] = bottomPerimeter + 1
+	return getTopPerimeter(topCoord, false)
+}
+
+func getBottomPerimeter(coord aoc.Coordinate, bottomMost bool) (topPerimeter aoc.Coordinate) {
+
+	if coord.X == maxRow || bottomMost {
+		leftCoord := aoc.Coordinate{X: coord.X, Y: coord.Y - 1}
+		diagCoord := aoc.Coordinate{X: coord.X + 1, Y: coord.Y - 1}
+
+		if garden[diagCoord] == garden[coord] {
+			return coord
+		}
+
+		if garden[leftCoord] != garden[coord] {
+			return coord
+		}
+
+		return getBottomPerimeter(leftCoord, false)
 	}
 
-	if !right && !top {
-		rightPerimeterMap[verticalKey] = rightPerimeter + 1
+	bottomCoord := aoc.Coordinate{X: coord.X + 1, Y: coord.Y}
+	if garden[bottomCoord] != garden[coord] {
+		return getBottomPerimeter(coord, true)
 	}
 
-	fmt.Printf("Coord: %v and TopPerimeter: %v\n", current, topPerimeterMap)
-	fmt.Printf("Coord: %v and BottomPerimeter: %v\n", current, bottomPerimeterMap)
-	fmt.Printf("Coord: %v and LeftPerimeter: %v\n", current, leftPerimeterMap)
-	fmt.Printf("Coord: %v and RightPerimeter: %v\n", current, rightPerimeterMap)
-	return
+	return getBottomPerimeter(bottomCoord, false)
+}
+
+func getLeftPerimeter(coord aoc.Coordinate, leftMost bool) (topPerimeter aoc.Coordinate) {
+
+	if coord.Y == 0 || leftMost {
+		topCoord := aoc.Coordinate{X: coord.X - 1, Y: coord.Y}
+		diagCoord := aoc.Coordinate{X: coord.X - 1, Y: coord.Y - 1}
+
+		if garden[diagCoord] == garden[coord] {
+			return coord
+		}
+
+		if garden[topCoord] != garden[coord] {
+			return coord
+		}
+
+		return getLeftPerimeter(topCoord, false)
+	}
+
+	leftCoord := aoc.Coordinate{X: coord.X, Y: coord.Y - 1}
+	if garden[leftCoord] != garden[coord] {
+		return getLeftPerimeter(coord, true)
+	}
+
+	return getLeftPerimeter(leftCoord, false)
+}
+
+func getRightPerimeter(coord aoc.Coordinate, rightMost bool) (topPerimeter aoc.Coordinate) {
+
+	if coord.Y == maxCol || rightMost {
+		topCoord := aoc.Coordinate{X: coord.X - 1, Y: coord.Y}
+		diagCoord := aoc.Coordinate{X: coord.X - 1, Y: coord.Y + 1}
+
+		if garden[diagCoord] == garden[coord] {
+			return coord
+		}
+
+		if garden[topCoord] != garden[coord] {
+			return coord
+		}
+
+		return getRightPerimeter(topCoord, false)
+	}
+
+	rightCoord := aoc.Coordinate{X: coord.X, Y: coord.Y + 1}
+	if garden[rightCoord] != garden[coord] {
+		return getRightPerimeter(coord, true)
+	}
+
+	return getRightPerimeter(rightCoord, false)
 }
